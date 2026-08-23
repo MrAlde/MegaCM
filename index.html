@@ -197,27 +197,34 @@ function isMega(v){
 function detectBank(v){
   const c = N(v);
 
+  // Rule awal tetap dipertahankan.
   if(c.includes('BCA')) return 'bca';
 
-  if(/(^|[^A-Z0-9])HP[A-Z0-9]*($|[^A-Z0-9])/.test(c) || /\bBRI\b/.test(c))
-    return 'bri';
+  // BRI: kode awal HP / BRI tetap, tambah BRIW.
+  if(
+    /(^|[^A-Z0-9])HP[A-Z0-9]*($|[^A-Z0-9])/.test(c) ||
+    /\bBRI\b/.test(c) ||
+    c.includes('BRIW')
+  ) return 'bri';
 
-  // BNI:
-  // - kode lama OR...
-  // - tulisan/kode yang mengandung BNI, contoh BNIW1 / BNIW 1
-  // - kode BN + angka, contoh BN1 / BN 1
+  // BNI: kode awal OR / BNI tetap, tambah BNIW dan BN + angka.
   if(
     /(^|[^A-Z0-9])OR[A-Z0-9]*($|[^A-Z0-9])/.test(c) ||
-    c.includes('BNI') ||
+    /\bBNI\b/.test(c) ||
+    c.includes('BNIW') ||
     /(^|[^A-Z0-9])BN\s*\d+($|[^A-Z0-9])/.test(c)
-  )
-    return 'bni';
+  ) return 'bni';
 
+  // Mandiri: MDR dan tulisan MANDIRI tetap masuk Mandiri.
   if(/(^|[^A-Z0-9])MDR[A-Z0-9]*($|[^A-Z0-9])/.test(c) || c.includes('MANDIRI'))
     return 'mandiri';
 
-  if(/(^|[^A-Z0-9])Q\d*($|[^A-Z0-9])/.test(c) || /\bQRIS\b/.test(c))
-    return 'qris';
+  // QRIS: Q / QRIS tetap, tambah HANA BANK sebagai QRIS.
+  if(
+    /(^|[^A-Z0-9])Q\d*($|[^A-Z0-9])/.test(c) ||
+    /\bQRIS\b/.test(c) ||
+    c.includes('HANA BANK')
+  ) return 'qris';
 
   return null;
 }
