@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rekap Bank Mega + Total NOTE Tanpa Pindah Dana</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg-left:#082456;
+  --bg-mid:#182f6d;
+  --bg-right:#272666;
+  --panel-dark:#071a35;
+  --panel-dark-2:#071a35;
+  --card-tint-1:rgba(58,73,137,.60);
+  --card-tint-2:rgba(43,55,115,.52);
+  --border:rgba(255,255,255,.10);
+  --text:#f3f7ff;
+  --muted:#c2cfe5;
+  --muted-2:#9fb0cf;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  background:linear-gradient(90deg,var(--bg-left) 0%, var(--bg-mid) 48%, var(--bg-right) 100%);
+}
+.wrap{width:min(1250px,94%);margin:auto;padding:20px 0 40px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
+.head h1{font-size:38px;line-height:1.05;margin:6px 0 8px;font-weight:900;letter-spacing:-.4px}
+.sub{color:var(--muted);margin-top:4px;line-height:1.4;font-size:14px}
+.badge{
+  border:1px solid var(--border);
+  padding:8px 14px;
+  border-radius:999px;
+  color:#e6eefb;
+  background:rgba(255,255,255,.04);
+  margin-top:14px;
+  font-size:13px
+}
+.sum,.rules,.grid,.note-grid{display:grid;gap:12px}
+.sum{grid-template-columns:repeat(5,1fr);margin:18px 0}
+.card,.box,.panel,.bank,.note-card{
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:none;
+}
+.card{
+  padding:16px;
+  background:#071a35;
+}
+.lab{font-size:11px;color:#cfdbef;font-weight:800;letter-spacing:.3px}
+.val{font-size:18px;font-weight:900;margin-top:10px;line-height:1.1}
+.cnt{font-size:11px;color:#a7bbd8;margin-top:8px;line-height:1.35}
+.rules{grid-template-columns:repeat(3,1fr);margin-bottom:18px}
+.rule{
+  padding:14px;
+  background:var(--panel-dark-2);
+}
+.section{margin:16px 0}
+.section h2{margin:0 0 5px;font-size:28px}
+.muted{color:var(--muted-2);font-size:12px;line-height:1.5}
+.grid{grid-template-columns:repeat(5,1fr);margin-top:10px}
+.bank{
+  padding:16px;
+  min-width:0;
+  background:linear-gradient(180deg,var(--card-tint-1),var(--card-tint-2));
+}
+.bank h3{margin:0 0 12px;font-size:18px;letter-spacing:.2px}
+.row{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:11px 0;border-top:1px solid rgba(255,255,255,.08)
+}
+.row:first-of-type{border-top:0}
+.name{font-size:11px;color:#d4def0;font-weight:700;max-width:65%;word-break:break-word;line-height:1.35}
+.num{font-weight:900;text-align:right;font-size:14px;line-height:1.2}
+.small{font-size:10px;color:#a1b2cf;margin-top:4px}
+.panel{
+  padding:18px;
+  margin-top:16px;
+  background:#071a35;
+}
+.note-grid{grid-template-columns:repeat(4,1fr);margin-top:12px}
+.note-card{
+  background:linear-gradient(180deg,var(--card-tint-1),var(--card-tint-2));
+  padding:14px;
+}
+.note-title{font-size:11px;color:#d6e1f2;font-weight:800;line-height:1.35}
+.note-value{font-size:18px;font-weight:900;margin-top:8px}
+.note-count{font-size:10px;color:#9bb0ce;margin-top:3px}
+textarea{
+  width:100%;min-height:250px;
+  background:#07162b;color:#e2edf8;
+  border:1px solid var(--border);
+  border-radius:14px;padding:12px;
+  font-family:Consolas,monospace
+}
+button{
+  margin-top:12px;margin-right:8px;padding:11px 16px;border:0;
+  border-radius:10px;font-weight:800;cursor:pointer
+}
+.primary{background:linear-gradient(90deg,#2e6ee8,#6f49d8);color:#fff}
+.secondary{
+  background:#1b2d4f;color:#d3dff0;
+  border:1px solid var(--border)
+}
+.status{margin-top:10px;color:#c1d2e8;font-size:12px;line-height:1.5}
+.empty{color:#a7bbd8;font-size:12px}
+.details{margin-top:18px}
+.drow{
+  display:grid;grid-template-columns:110px 120px 170px 1fr 110px 60px;
+  gap:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08);
+  font-size:11px;color:#d4e0f2
+}
+.warn{color:#ffd27a}
+.ok{color:#7ee2a8}
+@media(max-width:1100px){.sum,.grid,.note-grid{grid-template-columns:repeat(2,1fr)}.rules{grid-template-columns:1fr}}
+@media(max-width:650px){.head{flex-direction:column;align-items:flex-start}.sum,.grid,.note-grid{grid-template-columns:1fr}.drow{grid-template-columns:1fr}.head h1{font-size:34px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <h1>Rekap Mega</h1>
+      <div class="sub"></div>
+    </div>
+    <div class="badge">Feri Lanciau</div>
+  </div>
+
+  <div class="sum">
+    <div class="card"><div class="lab">TTL UANG MASUK</div><div class="val" id="sm">0</div><div class="cnt" id="cm">0 transaksi</div></div>
+    <div class="card"><div class="lab">TTL UANG KELUAR</div><div class="val" id="sk">0</div><div class="cnt" id="ck">0 transaksi</div></div>
+    <div class="card"><div class="lab">PINDAH DANA</div><div class="val" id="sp">0</div><div class="cnt" id="cp">0 transaksi</div></div>
+    <div class="card"><div class="lab">TIDAK DIKENALI</div><div class="val" id="su">0</div><div class="cnt">baris</div></div>
+  </div>
+
+    <section class="section box panel">
+    <h2>Total Semua</h2>
+    <div class="muted"></div>
+    <div class="note-grid" id="gNote"><div class="empty">Belum ada transaksi.</div></div>
+  </section>
+
+  <section class="section box panel">
+    <h2>Uang Masuk</h2>
+    <div class="muted"></div>
+    <div class="grid" id="gm"><div class="empty">Belum ada transaksi.</div></div>
+  </section>
+
+  <section class="section box panel">
+    <h2>Uang Keluar</h2>
+    <div class="muted"></div>
+    <div class="grid" id="gk"><div class="empty">Belum ada transaksi.</div></div>
+  </section>
+
+  <section class="section box panel">
+    <h2>Pindah Dana</h2>
+    <div class="muted"></div>
+    <div class="grid" id="gp"><div class="empty">Belum ada transaksi.</div></div>
+  </section>
+
+  
+
+
+<section class="panel">
+    <h2>Tempel Mega Disini</h2>
+    <div class="muted"></div>
+    <textarea id="inp" placeholder="Paste dari time sampai note di sini..."></textarea><br>
+    <button class="primary" id="btnHitung" type="button">Hitung Sekarang Teman</button>
+    <button class="secondary" id="btnBersih" type="button">Bersihkan</button>
+    <div class="status" id="st"></div>
+    <div class="details" id="det"></div>
+  </section>
+</main>
+
+<script>
+const banks = ['bca','bri','bni','mandiri','qris'];
+const labels = {bca:'BCA',bri:'BRI',bni:'BNI',mandiri:'MANDIRI',qris:'QRIS'};
+
+const N = v => String(v ?? '').trim().replace(/\s+/g,' ').toUpperCase();
+const F = n => new Intl.NumberFormat('id-ID').format(n);
+
+function splitLine(line){
+  if(line.includes('\t')) return line.split('\t').map(x=>x.trim());
+  return line.trim().split(/\s{2,}/).map(x=>x.trim());
+}
+
+function parseNum(v){
+  const s = String(v ?? '').replace(/[^\d-]/g,'');
+  if(!s || s === '-') return 0;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function isMega(v){
+  return N(v).includes('MEGA');
+}
+
+function detectBank(v){
+  const c = N(v);
+
+  if(c.includes('BCA')) return 'bca';
+
+  if(/(^|[^A-Z0-9])HP[A-Z0-9]*($|[^A-Z0-9])/.test(c) || /\bBRI\b/.test(c))
+    return 'bri';
+
+  if(/(^|[^A-Z0-9])OR[A-Z0-9]*($|[^A-Z0-9])/.test(c) || /\bBNI\b/.test(c))
+    return 'bni';
+
+  if(/(^|[^A-Z0-9])MDR[A-Z0-9]*($|[^A-Z0-9])/.test(c) || c.includes('MANDIRI'))
+    return 'mandiri';
+
+  if(/(^|[^A-Z0-9])Q\d*($|[^A-Z0-9])/.test(c) || /\bQRIS\b/.test(c))
+    return 'qris';
+
+  return null;
+}
+
+function classify(usr,bname){
+  const usrBank = detectBank(usr);
+  const bnameBank = detectBank(bname);
+  const usrMega = isMega(usr);
+  const bnameMega = isMega(bname);
+
+  // Uang masuk: dari bank menuju MEGA
+  if(usrBank && bnameMega){
+    return {flow:'masuk', key:usrBank, label:labels[usrBank]};
+  }
+
+  // Uang keluar: dari MEGA menuju bank
+  if(usrMega && bnameBank){
+    return {flow:'keluar', key:bnameBank, label:labels[bnameBank]};
+  }
+
+  // Pindah dana: bank menuju bank, sesama atau berbeda bank
+  if(usrBank && bnameBank){
+    return {
+      flow:'pindah',
+      key:usrBank + '>' + bnameBank,
+      label:labels[usrBank] + ' → ' + labels[bnameBank]
+    };
+  }
+
+  return null;
+}
+
+function addBucket(obj,key,note,wd){
+  if(!obj[key]) obj[key] = {};
+  if(!obj[key][note]) obj[key][note] = {total:0,count:0};
+  obj[key][note].total += wd;
+  obj[key][note].count += 1;
+}
+
+function esc(s){
+  return String(s ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+function makeCard(title,notes){
+  const e = document.createElement('div');
+  e.className = 'bank box';
+
+  const h = document.createElement('h3');
+  h.textContent = title;
+  e.appendChild(h);
+
+  Object.entries(notes)
+    .sort((a,b)=>b[1].total-a[1].total)
+    .forEach(([note,x])=>{
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `
+        <div class="name">${esc(note)}</div>
+        <div>
+          <div class="num">${F(x.total)}</div>
+          <div class="small">${x.count} trx</div>
+        </div>`;
+      e.appendChild(row);
+    });
+
+  return e;
+}
+
+function renderBankGrid(id,obj){
+  const g = document.getElementById(id);
+  g.innerHTML = '';
+
+  banks.forEach(b=>{
+    if(obj[b]) g.appendChild(makeCard(labels[b],obj[b]));
+  });
+
+  if(!g.children.length){
+    g.innerHTML = '<div class="empty">Belum ada transaksi.</div>';
+  }
+}
+
+function renderRouteGrid(id,obj){
+  const g = document.getElementById(id);
+  g.innerHTML = '';
+
+  Object.entries(obj)
+    .sort((a,b)=>{
+      const ta = Object.values(a[1]).reduce((s,x)=>s+x.total,0);
+      const tb = Object.values(b[1]).reduce((s,x)=>s+x.total,0);
+      return tb-ta;
+    })
+    .forEach(([route,notes])=>{
+      const [from,to] = route.split('>');
+      g.appendChild(makeCard(labels[from] + ' → ' + labels[to],notes));
+    });
+
+  if(!g.children.length){
+    g.innerHTML = '<div class="empty">Belum ada transaksi.</div>';
+  }
+}
+
+
+function renderNoteTotals(id,obj){
+  const g = document.getElementById(id);
+  g.innerHTML = '';
+
+  const entries = Object.entries(obj).sort((a,b)=>b[1].total-a[1].total);
+
+  entries.forEach(([note,x])=>{
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.innerHTML = `
+      <div class="note-title">${esc(note)}</div>
+      <div class="note-value">${F(x.total)}</div>
+      <div class="note-count">${x.count} transaksi</div>`;
+    g.appendChild(card);
+  });
+
+  if(!g.children.length){
+    g.innerHTML = '<div class="empty">Belum ada transaksi.</div>';
+  }
+}
+
+function runCalc(){
+  const text = document.getElementById('inp').value.trim();
+  const st = document.getElementById('st');
+
+  if(!text){
+    st.className = 'status warn';
+    st.textContent = 'Belum ada data yang ditempel.';
+    return;
+  }
+
+  const lines = text.split(/\r?\n/).filter(x=>x.trim());
+  if(lines.length < 2){
+    st.className = 'status warn';
+    st.textContent = 'Pastikan header dan baris transaksi ikut dicopy.';
+    return;
+  }
+
+  const header = splitLine(lines[0]).map(N);
+  const ix = {
+    usr: header.indexOf('USR'),
+    wd: header.indexOf('WD'),
+    bname: header.findIndex(x=>x==='B.NAME' || x==='BNAME'),
+    note: header.indexOf('NOTE')
+  };
+
+  if(Object.values(ix).some(x=>x<0)){
+    st.className = 'status warn';
+    st.textContent = 'Kolom USR, WD, B.NAME, atau NOTE tidak ditemukan.';
+    return;
+  }
+
+  const masuk = {};
+  const keluar = {};
+  const pindah = {};
+  const noteTotals = {};
+  const details = [];
+  const unknown = [];
+
+  let totalMasuk=0, totalKeluar=0, totalPindah=0;
+  let countMasuk=0, countKeluar=0, countPindah=0;
+
+  for(let i=1;i<lines.length;i++){
+    const c = splitLine(lines[i]);
+    if(c.length <= Math.max(...Object.values(ix))) continue;
+
+    const usr = c[ix.usr] || '';
+    const bname = c[ix.bname] || '';
+    const note = N(c[ix.note] || '') || 'TANPA NOTE';
+    const wd = parseNum(c[ix.wd]);
+
+    const cl = classify(usr,bname);
+
+    if(!cl){
+      unknown.push({row:i+1,usr,bname,note,wd});
+      continue;
+    }
+
+    if(cl.flow === 'masuk'){
+      addBucket(masuk,cl.key,note,wd);
+      totalMasuk += wd;
+      countMasuk++;
+    }else if(cl.flow === 'keluar'){
+      addBucket(keluar,cl.key,note,wd);
+      totalKeluar += wd;
+      countKeluar++;
+    }else{
+      addBucket(pindah,cl.key,note,wd);
+      totalPindah += wd;
+      countPindah++;
+    }
+
+    // Total Semua NOTE hanya menghitung Uang Masuk + Uang Keluar.
+    // Transaksi yang masuk kategori Pindah Dana tidak ikut dihitung di sini.
+    if(cl.flow !== 'pindah'){
+      if(!noteTotals[note]) noteTotals[note] = {total:0,count:0};
+      noteTotals[note].total += wd;
+      noteTotals[note].count += 1;
+    }
+
+    details.push({
+      flow:cl.flow,label:cl.label,note,usr,bname,wd,row:i+1
+    });
+  }
+
+  document.getElementById('sm').textContent = F(totalMasuk);
+  document.getElementById('sk').textContent = F(totalKeluar);
+  document.getElementById('sp').textContent = F(totalPindah);
+  document.getElementById('su').textContent = unknown.length;
+
+  document.getElementById('cm').textContent = countMasuk + ' transaksi';
+  document.getElementById('ck').textContent = countKeluar + ' transaksi';
+  document.getElementById('cp').textContent = countPindah + ' transaksi';
+
+  renderBankGrid('gm',masuk);
+  renderBankGrid('gk',keluar);
+  renderRouteGrid('gp',pindah);
+  renderNoteTotals('gNote',noteTotals);
+
+  const det = document.getElementById('det');
+  det.innerHTML = '<h3>Baris yang masuk perhitungan</h3>';
+
+  details.forEach(x=>{
+    const row = document.createElement('div');
+    row.className = 'drow';
+    const flowName = x.flow==='masuk' ? 'UANG MASUK' : x.flow==='keluar' ? 'UANG KELUAR' : 'PINDAH DANA';
+
+    row.innerHTML = `
+      <b>${flowName}</b>
+      <b>${esc(x.label)}</b>
+      <span>${esc(x.note)}</span>
+      <span>${esc(x.usr)} → ${esc(x.bname)}</span>
+      <span>WD: ${F(x.wd)}</span>
+      <span>${x.row}</span>`;
+    det.appendChild(row);
+  });
+
+  if(unknown.length){
+    st.className = 'status warn';
+    st.textContent = `Selesai. ${details.length} transaksi terbaca, ${unknown.length} baris belum dikenali. Contoh baris ${unknown[0].row}: ${unknown[0].usr} → ${unknown[0].bname}.`;
+  }else{
+    st.className = 'status ok';
+    st.textContent = `Selesai. ${details.length} transaksi berhasil dikelompokkan.`;
+  }
+}
+
+function clearAll(){
+  document.getElementById('inp').value = '';
+
+  ['sm','sk','sp','su'].forEach(id=>document.getElementById(id).textContent='0');
+  ['cm','ck','cp'].forEach(id=>document.getElementById(id).textContent='0 transaksi');
+
+  document.getElementById('gm').innerHTML='<div class="empty">Belum ada transaksi.</div>';
+  document.getElementById('gk').innerHTML='<div class="empty">Belum ada transaksi.</div>';
+  document.getElementById('gp').innerHTML='<div class="empty">Belum ada transaksi.</div>';
+  document.getElementById('gNote').innerHTML='<div class="empty">Belum ada transaksi.</div>';
+  document.getElementById('det').innerHTML='';
+  document.getElementById('st').textContent='';
+  document.getElementById('st').className='status';
+}
+
+// Pakai addEventListener agar tombol tidak bergantung pada onclick inline.
+document.getElementById('btnHitung').addEventListener('click', runCalc);
+document.getElementById('btnBersih').addEventListener('click', clearAll);
+</script>
+</body>
+</html>
