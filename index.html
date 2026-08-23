@@ -160,14 +160,11 @@ button{
     <div class="grid" id="gp"><div class="empty">Belum ada transaksi.</div></div>
   </section>
 
-  
-
-
 <section class="panel">
-    <h2>Tempel Mega Disini</h2>
+    <h2>Tempel Dari Export Data</h2>
     <div class="muted"></div>
     <textarea id="inp" placeholder="Paste dari time sampai note di sini..."></textarea><br>
-    <button class="primary" id="btnHitung" type="button">Hitung Sekarang Teman</button>
+    <button class="primary" id="btnHitung" type="button">Hitung Sekarang</button>
     <button class="secondary" id="btnBersih" type="button">Bersihkan</button>
     <div class="status" id="st"></div>
     <div class="details" id="det"></div>
@@ -205,7 +202,15 @@ function detectBank(v){
   if(/(^|[^A-Z0-9])HP[A-Z0-9]*($|[^A-Z0-9])/.test(c) || /\bBRI\b/.test(c))
     return 'bri';
 
-  if(/(^|[^A-Z0-9])OR[A-Z0-9]*($|[^A-Z0-9])/.test(c) || /\bBNI\b/.test(c))
+  // BNI:
+  // - kode lama OR...
+  // - tulisan/kode yang mengandung BNI, contoh BNIW1 / BNIW 1
+  // - kode BN + angka, contoh BN1 / BN 1
+  if(
+    /(^|[^A-Z0-9])OR[A-Z0-9]*($|[^A-Z0-9])/.test(c) ||
+    c.includes('BNI') ||
+    /(^|[^A-Z0-9])BN\s*\d+($|[^A-Z0-9])/.test(c)
+  )
     return 'bni';
 
   if(/(^|[^A-Z0-9])MDR[A-Z0-9]*($|[^A-Z0-9])/.test(c) || c.includes('MANDIRI'))
@@ -223,17 +228,14 @@ function classify(usr,bname){
   const usrMega = isMega(usr);
   const bnameMega = isMega(bname);
 
-  // Uang masuk: dari bank menuju MEGA
   if(usrBank && bnameMega){
     return {flow:'masuk', key:usrBank, label:labels[usrBank]};
   }
 
-  // Uang keluar: dari MEGA menuju bank
   if(usrMega && bnameBank){
     return {flow:'keluar', key:bnameBank, label:labels[bnameBank]};
   }
 
-  // Pindah dana: bank menuju bank, sesama atau berbeda bank
   if(usrBank && bnameBank){
     return {
       flow:'pindah',
@@ -318,7 +320,6 @@ function renderRouteGrid(id,obj){
     g.innerHTML = '<div class="empty">Belum ada transaksi.</div>';
   }
 }
-
 
 function renderNoteTotals(id,obj){
   const g = document.getElementById(id);
@@ -412,8 +413,6 @@ function runCalc(){
       countPindah++;
     }
 
-    // Total Semua NOTE hanya menghitung Uang Masuk + Uang Keluar.
-    // Transaksi yang masuk kategori Pindah Dana tidak ikut dihitung di sini.
     if(cl.flow !== 'pindah'){
       if(!noteTotals[note]) noteTotals[note] = {total:0,count:0};
       noteTotals[note].total += wd;
@@ -481,7 +480,6 @@ function clearAll(){
   document.getElementById('st').className='status';
 }
 
-// Pakai addEventListener agar tombol tidak bergantung pada onclick inline.
 document.getElementById('btnHitung').addEventListener('click', runCalc);
 document.getElementById('btnBersih').addEventListener('click', clearAll);
 </script>
